@@ -1,0 +1,206 @@
+#include "List.h"
+
+List::List()
+{
+	head = NULL;
+}
+
+List::~List()
+{
+	if (head != NULL)
+	{
+		while (head != NULL)
+		{
+			pop_front();
+		}
+	}
+}
+
+Car_rental_status List::input_elem()
+{
+    Car_rental_status object;
+    std::cout << "	Данные о выдаче на прокат или возврате автомобилей от клиентов:" << std::endl << std::endl;
+    object.driver_license_number = input_driver_license_number();
+    object.state_registration_number = input_state_registration_number();
+    object.date_receive = input_date("Дата выдачи машины ");
+    object.date_return = input_date("Дата возврата машины ");
+    std::cout << "Дата выдачи машины "; std::cin >> object.date_receive;
+    std::cout << "Дата возврата машины "; std::cin >> object.date_return;
+    do {
+        std::cout << "Признак наличия машины "; std::cin >> object.available;
+    } while (object.available != 0 || object.available != 1);
+    return object;
+}
+
+void List::push_back()
+{
+    Car_rental_status elem = input_elem();
+    node* temp = new node;
+	temp->data = elem;
+    temp->next = NULL;
+    node* p = head;
+	if (head == NULL)
+	{
+		head = temp;
+		head->next = NULL;
+	}
+	else
+	{
+		while (p->next != NULL)
+			p = p->next;
+		p->next = temp;
+	}
+}
+
+void List::push_front()
+{
+    Car_rental_status elem = input_elem();
+    node* temp = new node;
+	temp->data = elem;
+	if (head == NULL)
+	{
+		head = temp;
+		head->next = NULL;
+	}
+	else
+	{
+		temp->next = head;
+		head = temp;
+	}
+}
+
+void List::pop_back()
+{
+	if (head != NULL)
+	{
+        node* temp = head;
+        node* toDelete;
+		while (temp->next->next != NULL)
+			temp = temp->next;
+		toDelete = temp->next;
+		temp->next = NULL;
+	}
+}
+
+void List::pop_front()
+{
+	if (head)
+	{
+        node* toDelete = head;
+		head = head->next;
+		delete toDelete;
+	}
+}
+
+
+void List::remove(std::string state_registration_number)
+{
+    node* temp = head;
+    while (temp)
+    {
+        if (temp->next->data.state_registration_number == state_registration_number)
+        {
+            node *toDelete = temp->next;
+            temp->next = temp->next->next;
+            delete toDelete;
+            break;
+        }
+        temp = temp->next;
+    }
+}
+
+bool List::search(std::string state_registration_number)
+{
+    node* temp = head;
+    if (temp != NULL)
+    {
+        while (temp)
+        {
+            if (temp->data.state_registration_number == state_registration_number)
+                return true;
+            temp = temp->next;
+        }
+    }
+    return false;
+}
+
+int List::size()
+{
+    node* temp = head;
+    int counter = 0;
+    while (temp != NULL)
+    {
+        counter++;
+        temp = temp->next;
+    }
+    return counter;
+}
+
+Car_rental_status List::get_item(int index)
+{
+    node* temp = head;
+    int counter = 0;
+    while (temp != NULL)
+    {
+        //counter++;
+        if (counter == index)
+            return temp->data;
+        counter++;
+        temp = temp->next;
+    }
+}
+
+void List::edit(Car_rental_status elem, int size)
+{
+    node* temp = head;
+    int counter = 0;
+    while (temp != NULL)
+    {
+        if (counter == size)
+        {
+            temp->data = elem;
+            break;
+        }
+        temp = temp->next;
+        counter++;
+    }
+}
+
+void List::output_list()
+{
+    node* p = head;
+    if (p != NULL)
+    {
+        std::cout << " " << std::left << std::setw(35) << "номер водительского удостоверения" << std::setw(35) << "Государственный регистрационный номер" << std::setw(25)
+            << "Дата выдачи машины" << std::setw(25) << "Дата возврата машины" << std::setw(25) << "Признак наличия" << std::endl;
+        while (p != NULL)
+        {
+            std::cout << " " << std::left << std::setw(35) << p->data.driver_license_number << std::setw(35) << p->data.state_registration_number << std::setw(25) << p->data.date_receive
+                << std::setw(25) << p->data.date_return << std::setw(25) << p->data.available << std::endl;
+            p = p->next;
+        }
+    }
+    else std::cout << "Нет данных!";
+}
+
+void List::sort()
+{
+    Car_rental_status value;
+    Car_rental_status prev; //предыдущий элемент
+    int index = 0;
+    int N = size();
+    // Для всех элементов кроме начального
+    for (int i = 1; i < N; i++)
+    {
+        value = get_item(i); // запоминаем значение элемента
+        index = i;     // и его индекс
+        while ((index > 0) && (get_item(index - 1) > value))
+        {   // смещаем другие элементы к концу массива пока они меньше index
+            
+            prev = get_item(index - 1);
+            edit(prev, index);
+            index--;    // смещаем просмотр к началу массива
+        }
+        edit(value, index); // рассматриваемый элемент помещаем на освободившееся место
+    }
+}
