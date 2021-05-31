@@ -24,17 +24,11 @@ Car_rental_status List::input_elem()
     object.state_registration_number = input_state_registration_number();
     object.date_receive = input_date("Дата выдачи машины ");
     object.date_return = input_date("Дата возврата машины ");
-    std::cout << "Дата выдачи машины "; std::cin >> object.date_receive;
-    std::cout << "Дата возврата машины "; std::cin >> object.date_return;
-    do {
-        std::cout << "Признак наличия машины "; std::cin >> object.available;
-    } while (object.available != 0 || object.available != 1);
     return object;
 }
 
-void List::push_back()
+void List::push_back(Car_rental_status elem)
 {
-    Car_rental_status elem = input_elem();
     node* temp = new node;
 	temp->data = elem;
     temp->next = NULL;
@@ -46,7 +40,7 @@ void List::push_back()
 	}
 	else
 	{
-		while (p->next != NULL)
+		while (p->next)
 			p = p->next;
 		p->next = temp;
 	}
@@ -84,28 +78,38 @@ void List::pop_back()
 
 void List::pop_front()
 {
-	if (head)
-	{
+
+    if (head)
+    {
         node* toDelete = head;
-		head = head->next;
-		delete toDelete;
-	}
+        head = head->next;
+        delete toDelete;
+    }
 }
 
 
 void List::remove(std::string state_registration_number)
 {
-    node* temp = head;
-    while (temp)
+    node* temp = this->head;
+    if (temp->data.state_registration_number == state_registration_number)
     {
-        if (temp->next->data.state_registration_number == state_registration_number)
+        node* toDelete = head;
+        head = head->next;
+        delete toDelete;
+    }
+    else
+    {
+        while (temp->next != NULL)
         {
-            node *toDelete = temp->next;
-            temp->next = temp->next->next;
-            delete toDelete;
-            break;
+            if (temp->next->data.state_registration_number == state_registration_number)
+            {
+                node* toDelete = temp->next;
+                temp->next = temp->next->next;
+                delete toDelete;
+                break;
+            }
+            temp = temp->next;
         }
-        temp = temp->next;
     }
 }
 
@@ -126,7 +130,7 @@ bool List::search(std::string state_registration_number)
 
 int List::size()
 {
-    node* temp = head;
+    node* temp = this->head;
     int counter = 0;
     while (temp != NULL)
     {
@@ -168,15 +172,15 @@ void List::edit(Car_rental_status elem, int size)
 
 void List::output_list()
 {
-    node* p = head;
+    node* p = this->head;
     if (p != NULL)
     {
-        std::cout << " " << std::left << std::setw(35) << "номер водительского удостоверения" << std::setw(35) << "Государственный регистрационный номер" << std::setw(25)
-            << "Дата выдачи машины" << std::setw(25) << "Дата возврата машины" << std::setw(25) << "Признак наличия" << std::endl;
+        std::cout << " " << std::left << std::setw(35) << "номер водительского удостоверения" << std::setw(45) << "Государственный регистрационный номер" << std::setw(25)
+            << "Дата выдачи машины" << std::setw(25) << "Дата возврата машины" << std::endl;
         while (p != NULL)
         {
-            std::cout << " " << std::left << std::setw(35) << p->data.driver_license_number << std::setw(35) << p->data.state_registration_number << std::setw(25) << p->data.date_receive
-                << std::setw(25) << p->data.date_return << std::setw(25) << p->data.available << std::endl;
+            std::cout << " " << std::left << std::setw(35) << p->data.driver_license_number << std::setw(45) << p->data.state_registration_number << std::setw(35) << p->data.date_receive
+                << std::setw(35) << p->data.date_return << std::endl;
             p = p->next;
         }
     }
@@ -203,4 +207,85 @@ void List::sort()
         }
         edit(value, index); // рассматриваемый элемент помещаем на освободившееся место
     }
+}
+
+std::string List::searchBy_driver_license(std::string driver_license_number)
+{
+    node* temp =  this->head;
+    std::string str = "";
+    if (temp != NULL)
+    {
+        while (temp)
+        {
+            if (temp->data.driver_license_number == driver_license_number)
+            {
+                str = driver_license_number;
+                return str;
+            }
+            temp = temp->next;
+        }
+    }
+    return str;
+}
+
+std::string List::search_number(std::string state_registration_number, std::string driver_license_number)
+{
+    node* temp = this->head;
+    std::string str;
+    if (driver_license_number != "")
+        str = driver_license_number;
+    else
+        str = state_registration_number;
+    if (temp != NULL)
+    {
+        while (temp)
+        {
+            if (temp->data.driver_license_number == str)
+                return temp->data.state_registration_number;
+            else if (temp->data.state_registration_number == str)
+                return temp->data.driver_license_number;
+            temp = temp->next;
+        }
+    }
+    return str;
+}
+
+void List::removeByDriverLicense(std::string driver_license_number)
+{
+    node* temp = head;
+    while (temp)
+    {
+        if (temp->data.driver_license_number == driver_license_number)
+        {
+            node* toDelete = temp;
+            temp = temp->next;
+            delete toDelete;
+            break;
+        }
+        temp = temp->next;
+    }
+}
+
+Car_rental_status List::get(std::string state_registration_number)
+{
+    Car_rental_status elem;
+    node* temp = head;
+    while (temp != NULL)
+    {
+        if (temp->data.state_registration_number == state_registration_number)
+            return temp->data;
+        temp = temp->next;
+    }
+    return elem;
+}
+
+bool List::is_empty()
+{
+    return (this->head == NULL);
+}
+
+void List::clear()
+{
+    while (head)
+        pop_front();
 }

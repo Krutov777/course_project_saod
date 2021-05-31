@@ -140,12 +140,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Check_str.cpp" />
+    <ClCompile Include="HashTable.cpp" />
     <ClCompile Include="List.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Tree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Check_str.h" />
+    <ClInclude Include="HashTable.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="Tree.h" />
   </ItemGroup>
